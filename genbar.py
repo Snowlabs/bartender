@@ -4,6 +4,7 @@ from subprocess import Popen, PIPE
 from threading import Thread
 
 import re
+import shlex
 import sys
 
 
@@ -39,7 +40,7 @@ def genout(base, rep):
 # Starts a subprocess with cmds[id] as the command.
 # Output is flushed to replace[id] and genout is called every newline.
 def opensub(id):
-    with Popen(cmds[id].split(), stdout=PIPE, universal_newlines=True) as p:
+    with Popen(shlex.split(cmds[id]), stdout=PIPE, universal_newlines=True) as p:
         for line in p.stdout:
             replace[id] = line
             print(genout(base, replace), flush=True)
