@@ -1,5 +1,15 @@
 #!/bin/env python3
 
+"""Generate a bar from stdin
+
+This script asynchronously runs each command specified in stdin and
+replaces each command with its respective output and outputs it on
+every newline.
+
+Commands are specified using the <<cmd>> format. Each must continuously
+run and output every few seconds. Commands must flush their buffer.
+"""
+
 from subprocess import Popen, PIPE
 from threading import Thread
 
@@ -14,12 +24,12 @@ import sys
 stdin = sys.stdin.read()
 
 # Entire string split by matches
-base = re.split(r'(\$\([^\)]+\))', stdin)
+base = re.split(r'(<<[^>]+>>)', stdin)
 
 # List containing only the command names
-cmds = re.findall(r'(\$\([^\)]+\))', stdin)
+cmds = re.findall(r'(<<[^>]+>>)', stdin)
 for i, v in enumerate(cmds):
-    cmds[i] = cmds[i].strip("$()") # Removes '$()' chars
+    cmds[i] = cmds[i].lstrip("<").rstrip(">")
 
 # Output values from cmds to replace those in base
 replace = cmds[:]
