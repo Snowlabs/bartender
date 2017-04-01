@@ -1,0 +1,67 @@
+#!/bin/env python3
+
+import argparse
+import i3ipc
+
+
+# Parse arguments
+def get_args():
+    p = argparse.ArgumentParser(description='Output i3 workspace data')
+
+    p.add_argument('-S', action='store_true', dest='strip',
+                         help='Strip workspace numbers')
+
+    p.add_argument('-s', dest='sep', default='',
+                         help='Separator')
+
+    p.add_argument('-f', dest='unf', default='',
+                         help='Unfocused prefix')
+
+    p.add_argument('-F', dest='foc', default='',
+                         help='Focused prefix')
+
+    p.add_argument('-u', dest='urg', default='',
+                         help='Urgent prefix')
+
+    return p.parse_args()
+
+# rStrip string until ':'
+def strip_ws(s):
+    return s[s.find(':') + 1:]
+
+# Function is called on every focus
+# Print workspaces
+def on_workspace_focus(self, e):
+    r = '' # print
+
+    # Iterate through workspaces
+    for w in i3.get_tree().workspaces():
+
+        # Workspace name
+        n = strip_ws(w.name) if arg.strip else w.name
+
+        # When a window is focused the workspace isn't
+        # So we check if the workspace contains a focused container
+        if w.focused or w.find_focused() is not None:
+            r += arg.foc + n + arg.sep
+
+        elif w.urgent:
+            r += arg.urg + n + arg.sep
+
+        else:
+            r += arg.unf + n + arg.sep
+
+    # Flush is necessary for piping
+    print(r, flush=True)
+
+# Arguments
+arg = get_args()
+
+# Connect to i3
+i3 = i3ipc.Connection()
+
+# Subscribe to events
+i3.on('workspace::focus', on_workspace_focus)
+
+# Start main loop
+i3.main()
