@@ -15,6 +15,7 @@ from threading import Thread
 
 import re
 import shlex
+import signal
 import sys
 
 
@@ -32,9 +33,12 @@ for i, v in enumerate(cmds):
     cmds[i] = cmds[i].lstrip("<").rstrip(">")
 
 # Output values from cmds to replace those in base
+# Must be same size as cmds to manage ids
 replace = cmds[:]
 
-
+# Popen objects for each cmd
+# Must be same size as cmds to manage ids
+subproc = cmds[:]
 
 # Replace output of respective commands in the base string
 # Both args are lists of strings
@@ -50,12 +54,27 @@ def genout(base, rep):
 # Starts a subprocess with cmds[id] as the command.
 # Output is flushed to replace[id] and genout is called every newline.
 def opensub(id):
-    with Popen(shlex.split(cmds[id]), stdout=PIPE, universal_newlines=True) as p:
-        for line in p.stdout:
+    with Popen(shlex.split(cmds[id]), stdout=PIPE, universal_newlines=True) as subproc[id]:
+        for line in subproc[id].stdout:
             replace[id] = line
             print(genout(base, replace), flush=True)
 
+def closesub(id):
+    subproc[id].terminate()
 
 # Start each command on its own thread
-for i, v in enumerate(cmds):
-    Thread(target=opensub, args=(i,)).start()
+def start():
+    for i, v in enumerate(cmds):
+        Thread(target=opensub, args=(i,)).start()
+
+# Stop each subprocess with SIGTERM
+# *args is ignored
+def stop(*args):
+    print("Stopping")
+    for i, v in enumerate(cmds):
+        closesub(i)
+
+signal.signal(signal.SIGINT, stop)
+signal.signal(signal.SIGTERM, stop)
+
+start()
