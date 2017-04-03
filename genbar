@@ -67,14 +67,16 @@ def start():
     for i, v in enumerate(cmds):
         Thread(target=opensub, args=(i,)).start()
 
-# Stop each subprocess with SIGTERM
+# Terminate each process
 # *args is ignored
 def stop(*args):
     print("Stopping")
     for i, v in enumerate(cmds):
         closesub(i)
 
-signal.signal(signal.SIGINT, stop)
-signal.signal(signal.SIGTERM, stop)
+if __name__ == '__main__':
+    signal.signal(signal.SIGINT, stop)
+    signal.signal(signal.SIGTERM, stop)
+    signal.signal(signal.SIGPIPE, stop)
 
-start()
+    start()

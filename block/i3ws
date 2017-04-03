@@ -6,28 +6,50 @@ import i3ipc
 
 # Parse arguments
 def get_args():
-    p = argparse.ArgumentParser(description='Output i3 workspace data')
+    p = argparse.ArgumentParser(description='Output i3 workspace data '
+                                          + 'with each block '
+                                          + 'prefixed and suffixed '
+                                          + 'by specific identifiers '
+                                          + 'according to type')
 
     p.add_argument('-S', action='store_true', dest='strip',
                          help='Strip workspace numbers')
 
+    p.add_argument('-B', action='store_true', dest='butt',
+                         help='Add lemonbar formatted buttons')
+
     p.add_argument('-s', dest='sep', default='',
                          help='Separator')
 
-    p.add_argument('-f', dest='unf', default='',
-                         help='Unfocused prefix')
+    p.add_argument('-f', dest='unf', default=['', ''],
+                         nargs=2, metavar=('PREFIX', 'SUFFIX'),
+                         help='Unfocused block')
 
-    p.add_argument('-F', dest='foc', default='',
-                         help='Focused prefix')
+    p.add_argument('-F', dest='foc', default=['', ''],
+                         nargs=2, metavar=('PREFIX', 'SUFFIX'),
+                         help='Focused block')
 
-    p.add_argument('-u', dest='urg', default='',
-                         help='Urgent prefix')
+    p.add_argument('-u', dest='urg', default=['', ''],
+                         nargs=2, metavar=('PREFIX', 'SUFFIX'),
+                         help='Urgent block')
 
     return p.parse_args()
 
-# rStrip string until ':'
+
+# Remove chars until ':'
 def strip_ws(s):
     return s[s.find(':') + 1:]
+
+
+# Prepend every instance of char in s with prep
+def prepend_chars(s, char, prep):
+    r = ''
+
+    for sec in s.split(char):
+        r += sec + prep + char
+
+    return r[:len(r) - len(prep + char)]
+
 
 # Format workspace numbers with arg values and print
 def print_workspaces():
@@ -36,25 +58,36 @@ def print_workspaces():
     # Iterate through workspaces
     for w in i3.get_tree().workspaces():
 
-        n = strip_ws(w.name) if arg.strip else w.name
+        # Strip workspace numbers if necessary
+        if arg.strip:
+            n = strip_ws(w.name)
+        else:
+            n = w.name
 
         # When a window is focused the workspace isn't
         # So we check if the workspace contains a focused container
         if w.focused or w.find_focused() is not None:
-            r += arg.foc + n + arg.sep
+            r += arg.foc[0] + n + arg.foc[1] + arg.sep
 
         elif w.urgent:
-            r += arg.urg + n + arg.sep
+            r += arg.urg[0] + n + arg.urg[1] + arg.sep
 
         else:
-            r += arg.unf + n + arg.sep
+            r += arg.unf[0] + n + arg.unf[1] + arg.sep
 
+        # Add lemonbar button commands if necessary
+        if arg.butt:
+            r = '%{A:i3-msg workspace ' + prepend_chars(w.name, ':', '\\') \
+                + ':}' + r + '%{A}'
+
+    # Remove separator and print
     # Flush is necessary for piping
-    print(r, flush=True)
+    print(r[:len(r) - len(arg.sep)], flush=True)
 
 # Called on every workspace focus
 def on_workspace_focus(self, e):
     print_workspaces()
+
 
 # Arguments
 arg = get_args()
