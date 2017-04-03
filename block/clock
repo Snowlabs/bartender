@@ -2,5 +2,6 @@
 
 while true; do
     date "$@"
-    sleep 5
+    sleep 5 &
+    wait $!
 done
