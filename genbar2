@@ -8,6 +8,8 @@ import shlex
 import signal
 import sys
 
+import argparse
+
 
 class LineGen(object):
     def __init__(self, base, delims):
@@ -47,7 +49,16 @@ class LineGen(object):
 
 
 if __name__ == '__main__':
-    linegen = LineGen(sys.stdin.read(), ('<<', '>>'))
+    # parse args
+    parser = argparse.ArgumentParser(description='generate string to stdout'
+                                     ' from asynchronous command outputs')
+    parser.add_argument('-db', action='store')
+    parser.add_argument('-de', action='store')
+    settings = parser.parse_args()
+    # args parsed
+
+    linegen = LineGen(sys.stdin.read(), (settings.db if settings.db else '<<',
+                                         settings.de if settings.de else '>>'))
     signal.signal(signal.SIGINT, lambda *_: linegen.stop())
     signal.signal(signal.SIGTERM, lambda *_: linegen.stop())
     signal.signal(signal.SIGPIPE, lambda *_: linegen.stop())
