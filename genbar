@@ -19,7 +19,7 @@ import signal
 import sys
 
 
-## Variables
+# # Variables
 
 # Standard input
 stdin = sys.stdin.read()
@@ -34,16 +34,18 @@ for i, v in enumerate(cmds):
 
 # Output values from cmds to replace those in base
 # Must be same size as cmds to manage ids
-replace = cmds[:]
+replace = ['']*len(cmds)
 
 # Popen objects for each cmd
 # Must be same size as cmds to manage ids
-subproc = cmds[:]
+subproc = [None]*len(cmds)
 
-# Replace output of respective commands in the base string
-# Both args are lists of strings
-# Values from base are replaced from those in rep
+
 def genout(base, rep):
+    """ Replace output of respective commands in the base string
+    Both args are lists of strings
+    Values from base are replaced from those in rep
+    """
 
     for i, v in enumerate(rep):
         base[i * 2 + 1] = rep[i].rstrip('\n')
@@ -51,28 +53,35 @@ def genout(base, rep):
     return ''.join(base)
 
 
-# Starts a subprocess with cmds[id] as the command.
-# Output is flushed to replace[id] and genout is called every newline.
 def opensub(id):
-    with Popen(shlex.split(cmds[id]), stdout=PIPE, universal_newlines=True) as subproc[id]:
+    """ Starts a subprocess with cmds[id] as the command.
+    Output is flushed to replace[id] and genout is called every newline.
+    """
+    with Popen(shlex.split(cmds[id]),
+               stdout=PIPE, universal_newlines=True) as subproc[id]:
         for line in subproc[id].stdout:
             replace[id] = line
             print(genout(base, replace), flush=True)
 
+
 def closesub(id):
     subproc[id].terminate()
 
-# Start each command on its own thread
+
 def start():
+    """ Start each command on its own thread"""
     for i, v in enumerate(cmds):
         Thread(target=opensub, args=(i,)).start()
 
-# Terminate each process
-# *args is ignored
+
 def stop(*args):
+    """ Terminate each process
+    *args is ignored
+    """
     print("Stopping")
     for i, v in enumerate(cmds):
         closesub(i)
+
 
 if __name__ == '__main__':
     signal.signal(signal.SIGINT, stop)

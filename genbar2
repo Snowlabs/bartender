@@ -1,0 +1,55 @@
+#!/bin/env python3
+
+from subprocess import Popen, PIPE
+from threading import Thread
+
+import regex as re
+import shlex
+import signal
+import sys
+
+
+class LineGen(object):
+    def __init__(self, base, delims):
+        def repl(m):
+            self.cmds.append(m.group(1))
+            return '{}'
+        self.LDELIM, self.RDELIM = delims[0], delims[1]
+        self.base = base
+        self.cmds = []
+
+        self.template = re.sub(r'[{}]', lambda m: m.group()*2, self.base)
+        self.template = re.sub(
+            self.LDELIM + r'([^'+self.RDELIM+']*)' + self.RDELIM,
+            repl, self.template)
+        self.procs = [None]*len(self.cmds)
+        self.outs = ['']*len(self.cmds)
+
+    def start(self):
+        def assig_p(id):
+            self.procs[id] = Popen(shlex.split(self.cmds[id]),
+                                   stdout=PIPE,
+                                   universal_newlines=True)
+            for line in self.procs[id].stdout:
+                self.outs[id] = line if line[-1] != '\n' else line[:-1]
+                print(self.template.format(*self.outs), flush=True)
+
+        for i in range(len(self.cmds)):
+            Thread(target=assig_p, args=(i,)).start()
+
+    def stop(self):
+        """ Terminate each process
+        *args is ignored
+        """
+        print("Stopping")
+        for i in range(len(self.procs)):
+            self.procs[i].terminate()
+
+
+if __name__ == '__main__':
+    linegen = LineGen(sys.stdin.read(), ('<<', '>>'))
+    signal.signal(signal.SIGINT, lambda *_: linegen.stop())
+    signal.signal(signal.SIGTERM, lambda *_: linegen.stop())
+    signal.signal(signal.SIGPIPE, lambda *_: linegen.stop())
+
+    linegen.start()
