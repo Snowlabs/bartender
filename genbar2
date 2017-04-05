@@ -12,40 +12,69 @@ import argparse
 
 
 class LineGen(object):
+    """ Generate line with asynchronous outputs of commands """
     def __init__(self, base, delims):
+        # mini util function for recording m and returning '{}'
         def repl(m):
             self.cmds.append(m.group(1))
             return '{}'
+
+        # set args to corresponding attributes
         self.LDELIM, self.RDELIM = delims[0], delims[1]
         self.base = base
+
+        # empty default args list
         self.cmds = []
 
+        # escape all '{' and '}' characters
         self.template = re.sub(r'[{}]', lambda m: m.group()*2, self.base)
+
+        # replace all cmds with '{}' and record them to cmds list
+        # NOTE: SIDE EFFECT: builds cmds list
         self.template = re.sub(
             self.LDELIM + r'([^'+self.RDELIM+']*)' + self.RDELIM,
             repl, self.template)
+
+        # initialize lists with null values
         self.procs = [None]*len(self.cmds)
         self.outs = ['']*len(self.cmds)
 
+        # handle interupt signals (ignoring given params)
+        signal.signal(signal.SIGINT, lambda *_: self.stop())
+        signal.signal(signal.SIGTERM, lambda *_: self.stop())
+        signal.signal(signal.SIGPIPE, lambda *_: self.stop())
+
     def start(self):
+        """ Start processes """
+
+        # mini util function for assigning processes to threads
         def assig_p(id):
+            # start process
             self.procs[id] = Popen(shlex.split(self.cmds[id]),
                                    stdout=PIPE,
                                    universal_newlines=True)
+
+            # wait for new stdout line from command output
             for line in self.procs[id].stdout:
                 self.outs[id] = line if line[-1] != '\n' else line[:-1]
                 print(self.template.format(*self.outs), flush=True)
 
+        # assign each cmd process to a thread
         for i in range(len(self.cmds)):
             Thread(target=assig_p, args=(i,)).start()
 
     def stop(self):
-        """ Terminate each process
-        *args is ignored
-        """
-        print("Stopping")
-        for i in range(len(self.procs)):
-            self.procs[i].terminate()
+        """ Terminate each process """
+        print('Stopping...', file=sys.stderr)
+        for i, p in enumerate(self.procs):
+            print(' - Stopping proc %s: \'%s\''
+                  % (i, ' '.join(p.args)), file=sys.stderr)
+            p.stdout.close()
+            # NOTE: We technically dont need terminate
+            # because stdout.close sends SIGPIPE already
+            p.terminate()
+
+        print('Done', [p.poll() for p in self.procs], file=sys.stderr)
 
 
 if __name__ == '__main__':
@@ -57,10 +86,9 @@ if __name__ == '__main__':
     settings = parser.parse_args()
     # args parsed
 
+    # create linegen object
     linegen = LineGen(sys.stdin.read(), (settings.db if settings.db else '<<',
                                          settings.de if settings.de else '>>'))
-    signal.signal(signal.SIGINT, lambda *_: linegen.stop())
-    signal.signal(signal.SIGTERM, lambda *_: linegen.stop())
-    signal.signal(signal.SIGPIPE, lambda *_: linegen.stop())
 
+    # start linegen processes
     linegen.start()
