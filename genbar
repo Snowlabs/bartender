@@ -1,5 +1,15 @@
 #!/bin/env python3
 
+"""Generate a bar from stdin
+
+This script asynchronously runs each command specified in stdin and
+replaces each command with its respective output and outputs it on
+every newline.
+
+Commands are specified using the <<cmd>> format. Each must continuously
+run and output every few seconds. Commands must flush their buffer.
+"""
+
 from subprocess import Popen, PIPE
 from threading import Thread
 
