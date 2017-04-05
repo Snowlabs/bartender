@@ -1,91 +1,94 @@
 #!/bin/env python3
 
-"""Generate a bar from stdin
-
-This script asynchronously runs each command specified in stdin and
-replaces each command with its respective output and outputs it on
-every newline.
-
-Commands are specified using the <<cmd>> format. Each must continuously
-run and output every few seconds. Commands must flush their buffer.
-"""
-
 from subprocess import Popen, PIPE
 from threading import Thread
 
-import re
+import regex as re
 import shlex
 import signal
 import sys
 
-
-# # Variables
-
-# Standard input
-stdin = sys.stdin.read()
-
-# Entire string split by matches
-base = re.split(r'(<<[^>]+>>)', stdin)
-
-# List containing only the command names
-cmds = re.findall(r'(<<[^>]+>>)', stdin)
-for i, v in enumerate(cmds):
-    cmds[i] = cmds[i].lstrip("<").rstrip(">")
-
-# Output values from cmds to replace those in base
-# Must be same size as cmds to manage ids
-replace = ['']*len(cmds)
-
-# Popen objects for each cmd
-# Must be same size as cmds to manage ids
-subproc = [None]*len(cmds)
+import argparse
 
 
-def genout(base, rep):
-    """ Replace output of respective commands in the base string
-    Both args are lists of strings
-    Values from base are replaced from those in rep
-    """
+class LineGen(object):
+    """ Generate line with asynchronous outputs of commands """
+    def __init__(self, base, delims):
+        # mini util function for recording m and returning '{}'
+        def repl(m):
+            self.cmds.append(m.group(1))
+            return '{}'
 
-    for i, v in enumerate(rep):
-        base[i * 2 + 1] = rep[i].rstrip('\n')
+        # set args to corresponding attributes
+        self.LDELIM, self.RDELIM = delims[0], delims[1]
+        self.base = base
 
-    return ''.join(base)
+        # empty default args list
+        self.cmds = []
 
+        # escape all '{' and '}' characters
+        self.template = re.sub(r'[{}]', lambda m: m.group()*2, self.base)
 
-def opensub(id):
-    """ Starts a subprocess with cmds[id] as the command.
-    Output is flushed to replace[id] and genout is called every newline.
-    """
-    with Popen(shlex.split(cmds[id]),
-               stdout=PIPE, universal_newlines=True) as subproc[id]:
-        for line in subproc[id].stdout:
-            replace[id] = line
-            print(genout(base, replace), flush=True)
+        # replace all cmds with '{}' and record them to cmds list
+        # NOTE: SIDE EFFECT: builds cmds list
+        self.template = re.sub(
+            self.LDELIM + r'([^'+self.RDELIM+']*)' + self.RDELIM,
+            repl, self.template)
 
+        # initialize lists with null values
+        self.procs = [None]*len(self.cmds)
+        self.outs = ['']*len(self.cmds)
 
-def closesub(id):
-    subproc[id].terminate()
+        # handle interupt signals (ignoring given params)
+        signal.signal(signal.SIGINT, lambda *_: self.stop())
+        signal.signal(signal.SIGTERM, lambda *_: self.stop())
+        signal.signal(signal.SIGPIPE, lambda *_: self.stop())
 
+    def start(self):
+        """ Start processes """
 
-def start():
-    """ Start each command on its own thread"""
-    for i, v in enumerate(cmds):
-        Thread(target=opensub, args=(i,)).start()
+        # mini util function for assigning processes to threads
+        def assig_p(id):
+            # start process
+            self.procs[id] = Popen(shlex.split(self.cmds[id]),
+                                   stdout=PIPE,
+                                   universal_newlines=True)
 
+            # wait for new stdout line from command output
+            for line in self.procs[id].stdout:
+                self.outs[id] = line if line[-1] != '\n' else line[:-1]
+                print(self.template.format(*self.outs), flush=True)
 
-def stop(*args):
-    """ Terminate each process
-    *args is ignored
-    """
-    print("Stopping")
-    for i, v in enumerate(cmds):
-        closesub(i)
+        # assign each cmd process to a thread
+        for i in range(len(self.cmds)):
+            Thread(target=assig_p, args=(i,)).start()
+
+    def stop(self):
+        """ Terminate each process """
+        print('Stopping...', file=sys.stderr)
+        for i, p in enumerate(self.procs):
+            print(' - Stopping proc %s: \'%s\''
+                  % (i, ' '.join(p.args)), file=sys.stderr)
+            p.stdout.close()
+            # NOTE: We technically dont need terminate
+            # because stdout.close sends SIGPIPE already
+            p.terminate()
+
+        print('Done', [p.poll() for p in self.procs], file=sys.stderr)
 
 
 if __name__ == '__main__':
-    signal.signal(signal.SIGINT, stop)
-    signal.signal(signal.SIGTERM, stop)
-    signal.signal(signal.SIGPIPE, stop)
+    # parse args
+    parser = argparse.ArgumentParser(description='generate string to stdout'
+                                     ' from asynchronous command outputs')
+    parser.add_argument('-db', action='store')
+    parser.add_argument('-de', action='store')
+    settings = parser.parse_args()
+    # args parsed
 
-    start()
+    # create linegen object
+    linegen = LineGen(sys.stdin.read(), (settings.db if settings.db else '<<',
+                                         settings.de if settings.de else '>>'))
+
+    # start linegen processes
+    linegen.start()
