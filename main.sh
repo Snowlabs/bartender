@@ -14,10 +14,7 @@ echo -n "$BG$FG"
 
 ### Left
 echo -n "%{l}"
-echo -n "<<i3ws -S -B "
-echo -n "-f '$BG$FG  ' '  $BG$FG' -u '$UR  ' '  $BG$FG' "
-echo -n "-F '%{B#333}%{F#FFF}  ' '  $BG$FG'>>"
-echo -n "$BG$FG"
+echo -n "filler..."
 
 ### Center
 echo -n "%{c}"
@@ -29,8 +26,8 @@ echo -n " "
 echo -n "<<vol>>"
 echo -n " "
 
-#echo ""
+echo ""
 
-} | genbar \
-  | lemonbar -b -o 1 -f "Noto Sans" -o -1 -f "FontAwesome" \
+} | genbar2  \
+  | lemonbar -b -o 1 -f "Noto Sans" -o -1 -f "FontAwesome" DVI-1\
   | sh > /dev/null
