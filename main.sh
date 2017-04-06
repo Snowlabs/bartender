@@ -28,6 +28,6 @@ echo -n " "
 
 echo ""
 
-} | genbar2  \
+} | genbar \
   | lemonbar -b -o 1 -f "Noto Sans" -o -1 -f "FontAwesome" DVI-1\
   | sh > /dev/null
