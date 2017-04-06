@@ -45,6 +45,10 @@ class LineGen(object):
             self.LDELIM + r'([^'+self.RDELIM+']*)' + self.RDELIM,
             repl, self.template)
 
+        # unescape '{' & '}' in cmds
+        self.cmds = [re.sub(r'{{', '{', c) for c in self.cmds]
+        self.cmds = [re.sub(r'}}', '}', c) for c in self.cmds]
+
         # initialize lists with null values
         self.procs = [None]*len(self.cmds)
         self.outs = ['']*len(self.cmds)
