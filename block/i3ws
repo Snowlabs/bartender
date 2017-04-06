@@ -89,17 +89,17 @@ def on_workspace_focus(self, e):
     print_workspaces()
 
 
-# Arguments
-arg = get_args()
+if __name__ == '__main__':
 
-# Connect to i3
-i3 = i3ipc.Connection()
+    # Arguments
+    arg = get_args()
 
-# Initial workspaces print
-print_workspaces()
+    # Connect to i3
+    i3 = i3ipc.Connection()
 
-# Subscribe to events
-i3.on('workspace::focus', on_workspace_focus)
+    # Initial workspaces print
+    print_workspaces()
 
-# Start main loop
-i3.main()
+    # Subscribe to events and start main loop
+    i3.on('workspace::focus', on_workspace_focus)
+    i3.main()
