@@ -1,4 +1,4 @@
-# Strawbarry
+# Bartender
 
 Simple, modular bar generator
 
