@@ -1,0 +1,47 @@
+#!/bin/env python3
+
+import i3ipc
+import re
+import subprocess
+
+
+def print_window_name():
+    r = ''
+
+    root = subprocess.Popen(['xprop', '-root'], stdout=subprocess.PIPE)
+
+    for l in root.stdout:
+        m = re.search('^_NET_ACTIVE_WINDOW.* ([\w]+)$', l.decode('utf-8'))
+        if m != None:
+            window = subprocess.Popen(['xprop', '-id', m.group(1), 'WM_NAME'], stdout=subprocess.PIPE)
+            break
+
+    if window != None:
+        for l in window.stdout:
+            m = re.match('WM_NAME\(\w+\) = \"(?P<name>.+)\"$', l.decode('utf-8'))
+            if m != None:
+                r = m.group('name')
+
+    if len(r) >= 90:
+        r = r[:87] + '...'
+    else:
+        pass
+
+    print(r, flush=True)
+
+
+def on_window_event(self, e):
+    print_window_name()
+
+
+if __name__ == '__main__':
+
+    # Connect to i3
+    i3 = i3ipc.Connection()
+
+    # Initial workspaces print
+    print_window_name()
+
+    # Subscribe to events and start main loop
+    i3.on('window::', on_window_event)
+    i3.main()

@@ -13,7 +13,7 @@ run and output every few seconds. Commands must flush their buffer.
 from subprocess import Popen, PIPE
 from threading import Thread
 
-import regex as re
+import re
 import shlex
 import signal
 import sys
