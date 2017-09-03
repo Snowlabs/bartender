@@ -4,8 +4,8 @@ import argparse
 import i3ipc
 
 
-# Parse arguments
 def get_args():
+    """Parse arguments."""
     p = argparse.ArgumentParser(description='Output i3 workspace data '
                                           + 'with each block '
                                           + 'prefixed and suffixed '
@@ -36,13 +36,21 @@ def get_args():
     return p.parse_args()
 
 
-# Remove chars until ':'
 def strip_ws(s):
+    """Strip workspace numbers.
+
+    Remove the number and the colon.
+    """
+
     return s[s.find(':') + 1:]
 
 
-# Prepend every instance of char in s with prep
 def prepend_chars(s, char, prep):
+    """Prepend every instance of a character.
+
+    In s, prepend every instance of char with prep.
+    """
+
     r = ''
 
     for sec in s.split(char):
@@ -51,8 +59,9 @@ def prepend_chars(s, char, prep):
     return r[:len(r) - len(prep + char)]
 
 
-# Format workspace numbers with arg values and print
 def print_workspaces():
+    """Generate the workspace numbers."""
+
     r = '' # print
 
     # Iterate through workspaces
@@ -84,8 +93,9 @@ def print_workspaces():
     # Flush is necessary for piping
     print(r[:len(r) - len(arg.sep)], flush=True)
 
-# Called on every workspace focus
 def on_event(self, e):
+    """Called on every workspace focus."""
+
     print_workspaces()
 
 
