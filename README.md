@@ -6,9 +6,10 @@ Designed to be used with `lemonbar`
 
 ### Configuration
 
-Bars can easily be generated using a shell script. The script must
-source the provided `source.sh` file to add the block direcory to its
-`PATH`.
+Bars can easily be generated using a shell script. The script must have the
+genbar command and the commands under block in its path. Alternatively, the
+`$TENDERBLOCKS` variable can be set to the blocks directory for genbar to
+prepend to the path.
 
 Next, the string for `lemonbar` is piped into `genbar`, where each
 command to be run is delimited by `<<` and `>>`, which can be changed.
@@ -20,11 +21,9 @@ piped to sh for buttons.
 ````sh
 #!/bin/env sh
 
-# Sourcing this file adds the root and block dirs of this repo
-source path/to/source.sh
-
 # Between brackets the string to be piped is generated
 # This allows us to break down the string into readable segments
+# -n is used to not have a newline. Any command can be used, such as printf
 {
 
 # Center
