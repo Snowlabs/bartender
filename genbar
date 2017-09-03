@@ -21,8 +21,11 @@ import os
 
 import argparse
 
+try:
+    ENV_PATH = {'PATH': os.environ['TENDERBLOCKS'] + ':' + os.environ['PATH']}
+except KeyError:
+    ENV_PATH = os.environ
 
-ENV_PATH = {'PATH': os.environ['TENDERBLOCKS'] + ':' + os.environ['PATH']}
 
 
 class LineGen(object):
