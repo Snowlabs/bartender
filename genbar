@@ -17,8 +17,12 @@ import re
 import shlex
 import signal
 import sys
+import os
 
 import argparse
+
+
+ENV_PATH = {'PATH': os.environ['TENDERBLOCKS'] + ':' + os.environ['PATH']}
 
 
 class LineGen(object):
@@ -66,7 +70,8 @@ class LineGen(object):
             # start process
             self.procs[id] = Popen(shlex.split(self.cmds[id]),
                                    stdout=PIPE,
-                                   universal_newlines=True)
+                                   universal_newlines=True,
+                                   env=ENV_PATH)
 
             # wait for new stdout line from command output
             for line in self.procs[id].stdout:
