@@ -1,0 +1,71 @@
+#! /bin/sh
+
+usage() {
+    echo "Usage: $0 [-f FORMAT_STRING [-s SPACER_STRING]] -p PREV_STRING -n NEXT_STRING -P PLAY_STRING -S PAUSE_STRING" 1>&2
+    echo "Example: $0 -f 'prev:toggle:next:---:title'" 1>&2
+}
+
+backend_mpc() {
+    print_info() {
+        playing=$(mpc status | sed -n '2p' | awk "{ print(\$1); }")
+        if [ "$playing" = "[paused]" ]; then playing=0
+        else playing=1
+        fi
+
+        export IFS=":"
+        for block in $format; do
+            case $block in
+                "---")
+                    echo -n $spacer ;;
+                toggle)
+                    echo -n "{A1:mpc toggle:}"
+                    if [ $playing -eq 1 ]; then echo -n $pause_s;
+                    else echo -n $play_s
+                    fi
+                    echo -n "%{A}"
+                    ;;
+                play) echo -n "{A1:mpc play:}$play_s%{A}" ;;
+                pause) echo -n "{A1:mpc pause:}$pause_s%{A}" ;;
+                next) echo -n "{A1:mpc next:}$next_s%{A}" ;;
+                prev) echo -n "{A1:mpc next:}$prev_s%{A}" ;;
+                title) echo -n $(mpc current) ;;
+            esac
+        done
+        echo ""
+    }
+
+    event=
+    while :; do
+        print_info
+        event=$(mpc idle)
+    done
+}
+
+format=; spacer="|"
+prev_s=""
+next_s=""
+play_s=""
+pause_s=""
+while getopts ":f:s:p:n:P:S:" opt; do
+    case $opt in
+        p) prev_s="$OPTARG" ;;
+        n) next_s="$OPTARG" ;;
+        P) play_s="$OPTARG" ;;
+        S) play_s="$OPTARG" ;;
+        f) format="$OPTARG" ;;
+        s) spacer="$OPTARG" ;;
+        \?)
+            echo "Invalid option: -$OPTARG" 1>&2
+            usage
+            exit 1
+            ;;
+        :)
+            echo "Option -$OPTARG requires an argument." 1>&2
+            usage
+            exit 1
+            ;;
+    esac
+done
+
+backend_mpc
+
