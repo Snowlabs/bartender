@@ -15,7 +15,10 @@
    version="1.1"
    id="svg8"
    inkscape:version="0.92.2 5c3e80d, 2017-08-06"
-   sodipodi:docname="Logo_light.svg">
+   sodipodi:docname="Logo_light.svg"
+   inkscape:export-filename="/home/javier/Projects/Bartender/assets/logo_light_centered.png"
+   inkscape:export-xdpi="148"
+   inkscape:export-ydpi="148">
   <defs
      id="defs2" />
   <sodipodi:namedview
@@ -25,13 +28,13 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.1192842"
-     inkscape:cx="257.49134"
-     inkscape:cy="211.97678"
+     inkscape:zoom="0.30467983"
+     inkscape:cx="301.97994"
+     inkscape:cy="205.31189"
      inkscape:document-units="mm"
      inkscape:current-layer="layer3"
      showgrid="false"
-     inkscape:window-width="1570"
+     inkscape:window-width="778"
      inkscape:window-height="847"
      inkscape:window-x="12"
      inkscape:window-y="12"
