@@ -1,17 +1,76 @@
 #!/bin/sh
 
-# Command for retrieving volume
-cmd="amixer get Master \
-     | grep -Eo '\[[0-9]{1,3}%\]' \
-     | tr -d '[]%' \
-     | tail -1"
+usage() {
+    echo "Usage: $0 [-j < -i | -o > <-c CHANNEL>] -s" 1>&2;
+}
 
-# Responds to SIGUSR1
-trap ":" SIGUSR1
+jamyxer_mode() {
+    print_formatted() {
+        # Scroll action formatted for lemonbar
+        if [ $scroll ]; then
+            right="{A4:jmctl v$o\m $chan +5:}{A5:jmctl v$o\m $chan -5:}"
+            left="%{A}%{A}"
+        fi
+        echo -n $right
+        echo $1 | awk "{ printf(\"%d\", int( \$1 )); }"
+        echo $left
+    }
 
-# Stay alive
-while :; do
-    eval $cmd
-    sleep 10 &
-    wait $!
+    if [ -z "$chan" ]; then
+        echo "Channel not set!"
+        usage; exit 1
+    fi
+
+    if [ $jin ]; then o=o; else o=i; fi
+
+    print_formatted $(jmctl v$o\g $chan 2>&1)
+    while :; do
+        print_formatted $(jmctl v$o\listn $chan 2>&1)
+    done
+}
+
+alsa_mode() {
+    # Command for retrieving volume
+    cmd="amixer get Master \
+         | grep -Eo '\[[0-9]{1,3}%\]' \
+         | tr -d '[]%' \
+         | tail -1"
+
+    # Responds to SIGUSR1
+    trap ":" SIGUSR1
+
+    # Stay alive
+    while :; do
+        eval $cmd
+        sleep 10 &
+        wait $!
+    done
+}
+
+while getopts ":jioc:s" opt; do
+    case $opt in
+        j)
+            jamode=1 ;;
+        i)
+            jin=1 ;;
+        o)
+            jin=0 ;;
+        c)
+            chan=$OPTARG ;;
+        s)
+            # scroll action meant for use with lemonbar
+            scroll=1 ;;
+        \?)
+            echo "Invalid option: -$OPTARG" 1>&2
+            usage
+            exit 1
+            ;;
+        :)
+            echo "Option -$OPTARG requires an argument." 1>&2
+            usage
+            exit 1
+            ;;
+    esac
 done
+
+if [ $jamode ]; then jamyxer_mode; else alsa_mode; fi

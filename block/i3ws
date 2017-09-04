@@ -2,6 +2,7 @@
 
 import argparse
 import i3ipc
+import re
 
 
 def get_args():
@@ -11,6 +12,12 @@ def get_args():
                                           + 'prefixed and suffixed '
                                           + 'by specific identifiers '
                                           + 'according to type')
+
+    p.add_argument('-m', action='store', dest='monitor',
+                         help='Monitor to show workspaces from')
+
+    p.add_argument('-c', action='store_true', dest='scroll',
+                         help='Add lemonbar formatted scroll actions')
 
     p.add_argument('-S', action='store_true', dest='strip',
                          help='Strip workspace numbers')
@@ -51,22 +58,20 @@ def prepend_chars(s, char, prep):
     In s, prepend every instance of char with prep.
     """
 
-    r = ''
-
-    for sec in s.split(char):
-        r += sec + prep + char
-
-    return r[:len(r) - len(prep + char)]
-
+    return re.sub(char, lambda m: prep + m.group(0), s)
 
 def print_workspaces():
     """Generate the workspace numbers."""
 
-    r = '' # print
+    a = []  # print
+
+    # Filter through workspaces in selected monitor
+    ws = i3.get_workspaces()
+    if arg.monitor is not None:
+        ws = [w for w in ws if w.output == arg.monitor]
 
     # Iterate through workspaces
-    for w in i3.get_tree().workspaces():
-
+    for i, w in enumerate(ws):
         # Strip workspace numbers if necessary
         if arg.strip:
             n = strip_ws(w.name)
@@ -75,23 +80,32 @@ def print_workspaces():
 
         # When a window is focused the workspace isn't
         # So we check if the workspace contains a focused container
-        if w.focused or w.find_focused() is not None:
-            r += arg.foc[0] + n + arg.foc[1] + arg.sep
-
+        if w.focused:
+            pair = arg.foc
         elif w.urgent:
-            r += arg.urg[0] + n + arg.urg[1] + arg.sep
-
+            pair = arg.urg
         else:
-            r += arg.unf[0] + n + arg.unf[1] + arg.sep
+            pair = arg.unf
+
+        a.append('{0[0]}{1}{0[1]}'.format(pair, n))
 
         # Add lemonbar button commands if necessary
         if arg.butt:
-            r = '%{A:i3-msg workspace ' + prepend_chars(w.name, ':', '\\') \
-                + ':}' + r + '%{A}'
+            a[-1] = '%%{A:i3-msg workspace %s:}%s%%{A}' % \
+                (prepend_chars(w.name, ':', '\\'), a[-1])
 
-    # Remove separator and print
+        if arg.scroll:
+            if (w.visible and arg.monitor is not None) or\
+                    (w.focused and arg.monitor is None):
+                next = list(ws)[min(i+1, len(list(ws))-1)].name
+                prev = list(ws)[max(i-1, 0)].name
+
+
     # Flush is necessary for piping
-    print(r[:len(r) - len(arg.sep)], flush=True)
+    if arg.scroll:
+        print('%%{A4:i3-msg workspace %s:}' % prepend_chars(next, ':', '\\'), end='')
+        print('%%{A5:i3-msg workspace %s:}' % prepend_chars(prev, ':', '\\'), end='')
+    print(arg.sep.join(a) + ('%{A}'*2 if arg.scroll else ''), flush=True)
 
 def on_event(self, e):
     """Called on every workspace focus."""
