@@ -1,11 +1,20 @@
 #!/bin/sh
 
 usage() {
-    echo "Usage: $0 [-j < -i | -o > <-c CHANNEL>]" 1>&2;
+    echo "Usage: $0 [-j < -i | -o > <-c CHANNEL>] -s" 1>&2;
 }
 
 jamyxer_mode() {
-    print_round() { echo $1 | awk "{ print int( \$1 ); }"; }
+    print_formatted() {
+        # Scroll action formatted for lemonbar
+        if [ $scroll ]; then
+            right="{A4:jmctl v$o\m $chan +5:}{A5:jmctl v$o\m $chan -5:}"
+            left="%{A}%{A}"
+        fi
+        echo -n $right
+        echo $1 | awk "{ printf(\"%d\", int( \$1 )); }"
+        echo $left
+    }
 
     if [ -z "$chan" ]; then
         echo "Channel not set!"
@@ -14,9 +23,9 @@ jamyxer_mode() {
 
     if [ $jin ]; then o=o; else o=i; fi
 
-    print_round $(jmctl v$o\g $chan 2>&1)
+    print_formatted $(jmctl v$o\g $chan 2>&1)
     while :; do
-        print_round $(jmctl v$o\listn $chan 2>&1)
+        print_formatted $(jmctl v$o\listn $chan 2>&1)
     done
 }
 
@@ -38,7 +47,7 @@ alsa_mode() {
     done
 }
 
-while getopts ":jioc:" opt; do
+while getopts ":jioc:s" opt; do
     case $opt in
         j)
             jamode=1 ;;
@@ -48,6 +57,9 @@ while getopts ":jioc:" opt; do
             jin=0 ;;
         c)
             chan=$OPTARG ;;
+        s)
+            # scroll action meant for use with lemonbar
+            scroll=1 ;;
         \?)
             echo "Invalid option: -$OPTARG" 1>&2
             usage

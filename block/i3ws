@@ -62,7 +62,7 @@ def prepend_chars(s, char, prep):
 def print_workspaces():
     """Generate the workspace numbers."""
 
-    r = '' # print
+    a = []  # print
 
     # Iterate through workspaces
     for w in i3.get_tree().workspaces():
@@ -75,23 +75,23 @@ def print_workspaces():
 
         # When a window is focused the workspace isn't
         # So we check if the workspace contains a focused container
+        d = {'}
         if w.focused or w.find_focused() is not None:
-            r += arg.foc[0] + n + arg.foc[1] + arg.sep
+            a.append('{0[0]}{1}{0[1]}'.format(arg.foc, n))
 
         elif w.urgent:
-            r += arg.urg[0] + n + arg.urg[1] + arg.sep
+            a.append('{0[0]}{1}{0[1]}'.format(arg.urg, n))
 
         else:
-            r += arg.unf[0] + n + arg.unf[1] + arg.sep
+            a.append('{0[0]}{1}{0[1]}'.format(arg.unf, n))
 
         # Add lemonbar button commands if necessary
         if arg.butt:
-            r = '%{A:i3-msg workspace ' + prepend_chars(w.name, ':', '\\') \
-                + ':}' + r + '%{A}'
+            a[-1] = '%%{A:i3-msg workspace %s:}%s%%{A}' % \
+                (prepend_chars(w.name, ':', '\\'), a[-1])
 
-    # Remove separator and print
     # Flush is necessary for piping
-    print(r[:len(r) - len(arg.sep)], flush=True)
+    print(arg.sep.join(a), flush=True)
 
 def on_event(self, e):
     """Called on every workspace focus."""
