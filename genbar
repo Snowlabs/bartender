@@ -101,16 +101,21 @@ class LineGen(object):
 
 if __name__ == '__main__':
     # parse args
-    parser = argparse.ArgumentParser(description='generate string to stdout'
-                                     ' from asynchronous command outputs')
-    parser.add_argument('-db', action='store')
-    parser.add_argument('-de', action='store')
+    parser = argparse.ArgumentParser(description='Generate string to stdout'
+                                     ' from asynchronous command outputs.'
+                                     ' Replace the string between the begin'
+                                     ' delimiter and end delimiter with the'
+                                     ' command it contains\n'
+                                     'Default delimiters are << and >>'
+                                     ' respectively.'
+                                     )
+    parser.add_argument('-b', action='store', dest='begin', default='<<')
+    parser.add_argument('-e', action='store', dest='end', default='>>')
     settings = parser.parse_args()
     # args parsed
 
     # create linegen object
-    linegen = LineGen(sys.stdin.read(), (settings.db if settings.db else '<<',
-                                         settings.de if settings.de else '>>'))
+    linegen = LineGen(sys.stdin.read(), (settings.begin, settings.end))
 
     # start linegen processes
     linegen.start()
