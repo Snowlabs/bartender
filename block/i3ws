@@ -12,6 +12,9 @@ def get_args():
                                           + 'by specific identifiers '
                                           + 'according to type')
 
+    p.add_argument('-m', action='store', dest='monitor',
+                         help='Monitor to show workspaces from')
+
     p.add_argument('-S', action='store_true', dest='strip',
                          help='Strip workspace numbers')
 
@@ -65,7 +68,10 @@ def print_workspaces():
     a = []  # print
 
     # Iterate through workspaces
-    for w in i3.get_tree().workspaces():
+    for w in i3.get_workspaces():
+        # Skip if not chosen monitor
+        if arg.monitor is not None and w.output != arg.monitor:
+            continue
 
         # Strip workspace numbers if necessary
         if arg.strip:
@@ -75,15 +81,14 @@ def print_workspaces():
 
         # When a window is focused the workspace isn't
         # So we check if the workspace contains a focused container
-        d = {'}
-        if w.focused or w.find_focused() is not None:
-            a.append('{0[0]}{1}{0[1]}'.format(arg.foc, n))
-
+        if w.focused:
+            pair = arg.foc
         elif w.urgent:
-            a.append('{0[0]}{1}{0[1]}'.format(arg.urg, n))
-
+            pair = arg.urg
         else:
-            a.append('{0[0]}{1}{0[1]}'.format(arg.unf, n))
+            pair = arg.unf
+
+        a.append('{0[0]}{1}{0[1]}'.format(pair, n))
 
         # Add lemonbar button commands if necessary
         if arg.butt:
