@@ -18,16 +18,16 @@ backend_mpc() {
                 "---")
                     echo -n $spacer ;;
                 toggle)
-                    echo -n "{A1:mpc toggle:}"
+                    echo -n "%{A:mpc toggle:}"
                     if [ $playing -eq 1 ]; then echo -n $pause_s;
                     else echo -n $play_s
                     fi
                     echo -n "%{A}"
                     ;;
-                play) echo -n "{A1:mpc play:}$play_s%{A}" ;;
-                pause) echo -n "{A1:mpc pause:}$pause_s%{A}" ;;
-                next) echo -n "{A1:mpc next:}$next_s%{A}" ;;
-                prev) echo -n "{A1:mpc next:}$prev_s%{A}" ;;
+                play)  echo -n "%{A:mpc play:}$play_s%{A}" ;;
+                pause) echo -n "%{A:mpc pause:}$pause_s%{A}" ;;
+                next)  echo -n "%{A:mpc next:}$next_s%{A}" ;;
+                prev)  echo -n "%{A:mpc next:}$prev_s%{A}" ;;
                 title) echo -n $(mpc current) ;;
             esac
         done
