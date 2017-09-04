@@ -1,5 +1,26 @@
 #!/bin/sh
 
+interval=5
+
+while getopts hn: arg; do
+    case "$arg" in
+        n)
+            interval="$OPTARG"
+            ;;
+
+        h)
+            echo "Usage: $0 [-n interval] [-h] [date_format]"
+            exit 0
+            ;;
+        ?)
+            echo "-h for help"
+            exit 1
+            ;;
+    esac
+done
+
+shift $((OPTIND - 1))
+
 while true; do
     date "$@"
     sleep 5 &
