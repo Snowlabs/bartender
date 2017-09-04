@@ -1,20 +1,20 @@
 # Bartender
 
 ![logo](assets/logo_light_centered.png)
+***
 
+<p align="center">
+<b><a href="#usage">Usage</a></b>
+|
+<b><a href="installation">Installation</a></b>
+</p>
+
+***
 Simple, modular bar generator
 Designed to be used with `lemonbar`
 
-```sh
-{ echo -n "%{c}<<clock>>" } | genbar | lemonbar | sh
-```
-
-### Installation
-
-Bartender can simply be installed by cloning the repo and adding the root
-directory to PATH. For the blocks, any script can be used. `genbar` allows the
-usage of a `$TENDERBLOCKS` variable, which is prepended to the PATH. This can
-be used to point to the `block` directory.
+## Usage
+![Usage](assets/Usage.png)
 
 ### Configuration
 
@@ -51,3 +51,12 @@ echo -n "<<clock +%H:%M>>"
 
 } | genbar | lemonbar | sh
 ````
+
+
+## Installation
+
+Bartender can simply be installed by cloning the repo and adding the root
+directory to PATH. For the blocks, any script can be used. `genbar` allows the
+usage of a `$TENDERBLOCKS` variable, which is prepended to the PATH. This can
+be used to point to the `block` directory.
+
