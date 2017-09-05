@@ -76,7 +76,7 @@ class LineGen(object):
             # start process
             self.procs[id] = Popen(shlex.split(self.cmds[id])
                                    # no need to split if in shell=True mode
-                                   if not self.settings.safe_mode
+                                   if self.settings.safe_mode
                                    else self.cmds[id],
 
                                    shell=not self.settings.safe_mode,
