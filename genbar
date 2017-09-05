@@ -30,7 +30,7 @@ except KeyError:
 
 class LineGen(object):
     """ Generate line with asynchronous outputs of commands """
-    def __init__(self, base, delims):
+    def __init__(self, base, delims, settings):
         # mini util function for recording m and returning '{}'
         def repl(m):
             self.cmds.append(m.group(1))
@@ -39,6 +39,9 @@ class LineGen(object):
         # set args to corresponding attributes
         self.LDELIM, self.RDELIM = delims[0], delims[1]
         self.base = base
+
+        # for extra settings
+        self.settings = settings
 
         # empty default args list
         self.cmds = []
@@ -71,7 +74,12 @@ class LineGen(object):
         # mini util function for assigning processes to threads
         def assig_p(id):
             # start process
-            self.procs[id] = Popen(shlex.split(self.cmds[id]),
+            self.procs[id] = Popen(shlex.split(self.cmds[id])
+                                   # no need to split if in shell=True mode
+                                   if not self.settings.safe_mode
+                                   else self.cmds[id],
+
+                                   shell=not self.settings.safe_mode,
                                    stdout=PIPE,
                                    universal_newlines=True,
                                    env=ENV_PATH)
@@ -111,11 +119,17 @@ if __name__ == '__main__':
                                      )
     parser.add_argument('-b', action='store', dest='begin', default='<<')
     parser.add_argument('-e', action='store', dest='end', default='>>')
+
+    parser.add_argument('-s', action='store_true', dest='safe_mode',
+                        default=False)
+
     settings = parser.parse_args()
     # args parsed
 
     # create linegen object
-    linegen = LineGen(sys.stdin.read(), (settings.begin, settings.end))
+    linegen = LineGen(sys.stdin.read(),
+                      (settings.begin, settings.end),
+                      settings)
 
     # start linegen processes
     linegen.start()
