@@ -73,16 +73,31 @@ class LineGen(object):
 
         # mini util function for assigning processes to threads
         def assig_p(id):
-            # start process
-            self.procs[id] = Popen(shlex.split(self.cmds[id])
-                                   # no need to split if in shell=True mode
-                                   if self.settings.safe_mode
-                                   else self.cmds[id],
+            # macro for Popen (gets repetitive without this)
+            def openP(): return Popen(curcmd, stdin=lastout, stdout=PIPE,
+                                      universal_newlines=True, env=ENV_PATH,
+                                      shell=False)
 
-                                   shell=not self.settings.safe_mode,
-                                   stdout=PIPE,
-                                   universal_newlines=True,
-                                   env=ENV_PATH)
+            # start process
+
+            # Apparently a lot of people absolutely hate the use of
+            # `shell=True` so we parse pipes ourselves here
+            split = shlex.split(self.cmds[id])
+            curcmd = []
+            lastout = None
+            # iterate through elements of the input command
+            for i, a in enumerate(split):
+                # intermediate commands get piped into eachother
+                if a == '|':
+                    lastout = openP().stdout
+                    curcmd = []
+                    continue
+                else:
+                    curcmd.append(a)
+
+                # if it's the last command
+                if i == len(split)-1:
+                    self.procs[id] = openP()
 
             # wait for new stdout line from command output
             for line in self.procs[id].stdout:
@@ -120,16 +135,12 @@ if __name__ == '__main__':
     parser.add_argument('-b', action='store', dest='begin', default='<<')
     parser.add_argument('-e', action='store', dest='end', default='>>')
 
-    parser.add_argument('-s', action='store_true', dest='safe_mode',
-                        default=False)
-
     settings = parser.parse_args()
     # args parsed
 
     # create linegen object
     linegen = LineGen(sys.stdin.read(),
-                      (settings.begin, settings.end),
-                      settings)
+                      (settings.begin, settings.end), settings)
 
     # start linegen processes
     linegen.start()
