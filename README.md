@@ -55,8 +55,20 @@ echo -n "<<clock +%H:%M>>"
 
 ## Installation
 
+### Manual Installation
+
 Bartender can simply be installed by cloning the repo and adding the root
 directory to PATH. For the blocks, any script can be used. `genbar` allows the
 usage of a `$TENDERBLOCKS` variable, which is prepended to the PATH. This can
 be used to point to the `block` directory.
 
+### Recommended Installation
+
+We recommend using [zplug](github.com/zplug/zplug) for an easy installation:
+(Don't forget to set the path to the tender blocks!)
+#### ~/.zshrc
+```zsh
+export TENDERBLOCKS="<ZPLUG_HOME>/repos/CherryMan/bartender/block"
+
+zplug "CherryMan/bartender", use:"genbar", as:command
+```
