@@ -12,14 +12,16 @@ def print_window_name():
 
     for l in root.stdout:
         m = re.search('^_NET_ACTIVE_WINDOW.* ([\w]+)$', l.decode('utf-8'))
-        if m != None:
-            window = subprocess.Popen(['xprop', '-id', m.group(1), 'WM_NAME'], stdout=subprocess.PIPE)
+        if m is not None:
+            window = subprocess.Popen(['xprop', '-id', m.group(1), 'WM_NAME'],
+                                      stdout=subprocess.PIPE)
             break
 
-    if window != None:
+    if window is not None:
         for l in window.stdout:
-            m = re.match('WM_NAME\(\w+\) = \"(?P<name>.+)\"$', l.decode('utf-8'))
-            if m != None:
+            m = re.match('WM_NAME\(\w+\) = \"(?P<name>.+)\"$',
+                         l.decode('utf-8'))
+            if m is not None:
                 r = m.group('name')
 
     if len(r) >= 90:

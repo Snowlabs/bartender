@@ -8,37 +8,37 @@ import re
 def get_args():
     """Parse arguments."""
     p = argparse.ArgumentParser(description='Output i3 workspace data '
-                                          + 'with each block '
-                                          + 'prefixed and suffixed '
-                                          + 'by specific identifiers '
-                                          + 'according to type')
+                                + 'with each block '
+                                + 'prefixed and suffixed '
+                                + 'by specific identifiers '
+                                + 'according to type')
 
     p.add_argument('-m', action='store', dest='monitor',
-                         help='Monitor to show workspaces from')
+                   help='Monitor to show workspaces from')
 
     p.add_argument('-c', action='store_true', dest='scroll',
-                         help='Add lemonbar formatted scroll actions')
+                   help='Add lemonbar formatted scroll actions')
 
     p.add_argument('-S', action='store_true', dest='strip',
-                         help='Strip workspace numbers')
+                   help='Strip workspace numbers')
 
     p.add_argument('-B', action='store_true', dest='butt',
-                         help='Add lemonbar formatted buttons')
+                   help='Add lemonbar formatted buttons')
 
     p.add_argument('-s', dest='sep', default='',
-                         help='Separator')
+                   help='Separator')
 
     p.add_argument('-f', dest='unf', default=['', ''],
-                         nargs=2, metavar=('PREFIX', 'SUFFIX'),
-                         help='Unfocused block')
+                   nargs=2, metavar=('PREFIX', 'SUFFIX'),
+                   help='Unfocused block')
 
     p.add_argument('-F', dest='foc', default=['', ''],
-                         nargs=2, metavar=('PREFIX', 'SUFFIX'),
-                         help='Focused block')
+                   nargs=2, metavar=('PREFIX', 'SUFFIX'),
+                   help='Focused block')
 
     p.add_argument('-u', dest='urg', default=['', ''],
-                         nargs=2, metavar=('PREFIX', 'SUFFIX'),
-                         help='Urgent block')
+                   nargs=2, metavar=('PREFIX', 'SUFFIX'),
+                   help='Urgent block')
 
     return p.parse_args()
 
@@ -59,6 +59,7 @@ def prepend_chars(s, char, prep):
     """
 
     return re.sub(char, lambda m: prep + m.group(0), s)
+
 
 def print_workspaces():
     """Generate the workspace numbers."""
@@ -100,12 +101,14 @@ def print_workspaces():
                 next = list(ws)[min(i+1, len(list(ws))-1)].name
                 prev = list(ws)[max(i-1, 0)].name
 
-
     # Flush is necessary for piping
     if arg.scroll:
-        print('%%{A5:i3-msg workspace %s:}' % prepend_chars(next, ':', '\\'), end='')
-        print('%%{A4:i3-msg workspace %s:}' % prepend_chars(prev, ':', '\\'), end='')
+        print('%%{A5:i3-msg workspace %s:}' %
+              prepend_chars(next, ':', '\\'), end='')
+        print('%%{A4:i3-msg workspace %s:}' %
+              prepend_chars(prev, ':', '\\'), end='')
     print(arg.sep.join(a) + ('%{A}'*2 if arg.scroll else ''), flush=True)
+
 
 def on_event(self, e):
     """Called on every workspace focus."""
