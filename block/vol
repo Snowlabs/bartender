@@ -75,19 +75,12 @@ chan=Master
 interval=5
 while getopts ":jioc:su:" opt; do
     case $opt in
-        j)
-            mode=jamyxer ;;
-        i)
-            jin=1 ;;
-        o)
-            jin=0 ;;
-        c)
-            chan="$OPTARG" ;;
-        s)
-            # scroll action meant for use with lemonbar
-            scroll=1 ;;
-        i)
-            interval="$OPTARG"
+        j) mode=jamyxer ;;
+        i) jin=1 ;;
+        o) jin=0 ;;
+        c) chan="$OPTARG" ;;
+        s) scroll=1 ;; # scroll action meant for use with lemonbar
+        i) interval="$OPTARG" ;;
         h)
             usage
             exit 0
@@ -106,10 +99,8 @@ while getopts ":jioc:su:" opt; do
 done
 
 case "$mode" in
-    jamyxer)
-            jamyxer_mode;;
-    alsa)
-            alsa_mode;;
+    jamyxer) jamyxer_mode;;
+    alsa) alsa_mode;;
     *)
             echo "Invalid mode $mode, check -h for mode info." 1>&2
             exit 1
