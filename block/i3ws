@@ -103,8 +103,8 @@ def print_workspaces():
 
     # Flush is necessary for piping
     if arg.scroll:
-        print('%%{A4:i3-msg workspace %s:}' % prepend_chars(next, ':', '\\'), end='')
-        print('%%{A5:i3-msg workspace %s:}' % prepend_chars(prev, ':', '\\'), end='')
+        print('%%{A5:i3-msg workspace %s:}' % prepend_chars(next, ':', '\\'), end='')
+        print('%%{A4:i3-msg workspace %s:}' % prepend_chars(prev, ':', '\\'), end='')
     print(arg.sep.join(a) + ('%{A}'*2 if arg.scroll else ''), flush=True)
 
 def on_event(self, e):
