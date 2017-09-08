@@ -40,6 +40,18 @@ def get_args():
                    nargs=2, metavar=('PREFIX', 'SUFFIX'),
                    help='Urgent block')
 
+    p.add_argument('-psf', dest='unf_ps', default=['', ''],
+                   nargs=2, metavar=('PREFIX', 'SUFFIX'),
+                   help='Global p/s for unfocused block in beginning')
+
+    p.add_argument('-psF', dest='foc_ps', default=['', ''],
+                   nargs=2, metavar=('PREFIX', 'SUFFIX'),
+                   help='Global p/s for focused block in beginning')
+
+    p.add_argument('-psu', dest='urg_ps', default=['', ''],
+                   nargs=2, metavar=('PREFIX', 'SUFFIX'),
+                   help='Global p/s for urgent block in beginning')
+
     return p.parse_args()
 
 
@@ -83,12 +95,18 @@ def print_workspaces():
         # So we check if the workspace contains a focused container
         if w.focused:
             pair = arg.foc
+            ps = arg.foc_ps
         elif w.urgent:
             pair = arg.urg
+            ps = arg.urg_ps
         else:
             pair = arg.unf
+            ps = arg.unf_ps
 
-        a.append('{0[0]}{1}{0[1]}'.format(pair, n))
+        p = ps[0] if i == 0 else ''
+        s = ps[1] if i == len(ws)-1 else ''
+
+        a.append(p + '{0[0]}{1}{0[1]}'.format(pair, n) + s)
 
         # Add lemonbar button commands if necessary
         if arg.butt:
