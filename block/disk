@@ -1,0 +1,86 @@
+#!/bin/sh
+
+usage() {
+    echo "Usage: $0 [-h] [-H] [-n INTERVAL] [-u | -a | -p] DISK"
+    echo "Output info on the specified disk."
+    echo ""
+
+    echo "Arguments"
+    echo "  -n " "Update interval."
+    echo "  -H " "Human-readable output."
+    echo "  -t " "Output type. One of: size, used, available, percent."
+    echo ""
+}
+
+check_err() {
+    # check if $dev exists
+    if [ -z "$(df | awk "\$6 == \"$dev\" { print \$6 }")" ]; then
+        echo "No disk $dev found" 1>&2
+        exit 1
+
+    # make sure $type is correct
+    elif ! echo "$type" | grep -qE 'size|used|available|percent'; then
+        echo "Type $type is invalid. Check -h for more info" 1>&2
+        exit 1
+    fi
+}
+
+run() {
+    print_info() {
+        df -P | awk -vdev="$dev" -vtype="$type" -vh="$human" '
+
+        function put(s) {
+            if (h)
+                if (s > 1024^2)
+                    printf "%.1f%s\n", s/1024^2, "G"
+                else if (s > 1024^1)
+                    printf "%.1f%s\n", s/1024^1, "G"
+                else
+                    printf "%.1f%s\n", s, "K"
+            else {
+                print s
+            }
+        }
+
+        # TODO fix this
+        $6 == dev {
+            if (type == "percent") print($5)
+            else if (type == "size") put($2)
+            else if (type == "used") put($3)
+            else if (type == "available") put($4)
+        }
+        '
+    }
+
+    while :; do
+        print_info
+        sleep $sleep || break
+        wait $!
+    done
+}
+
+sleep=120
+human=0 # false
+type=percent
+while getopts n:Ht:h arg; do
+    case "$arg" in
+        n)  sleep="$OPTARG" ;;
+        H)  human=1 ;;
+        t)  type="$OPTARG" ;;
+        h)  usage
+            exit 0
+            ;;
+        ?)  usage
+            exit 1
+            ;;
+        :)  echo "Invalid argument -$OPTARG" 1>&2
+            exit 1
+            ;;
+    esac
+done
+
+shift $((OPTIND - 1))
+dev="${@-'/'}"
+
+check_err
+run
