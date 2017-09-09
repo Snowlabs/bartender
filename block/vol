@@ -59,8 +59,10 @@ alsa_mode() {
         echo "${pre}$(eval $cmd)${suf}"
     }
 
-    # Respond to SIGUSR1
-    trap ":" USR1
+    if [ "$1" = "update" ]; then
+        print_vol
+        return
+    fi
 
     # Stay alive
     while :; do
@@ -99,8 +101,13 @@ while getopts ":jioc:su:" opt; do
 done
 
 case "$mode" in
-    jamyxer) jamyxer_mode;;
-    alsa) alsa_mode;;
+    jamyxer)
+            jamyxer_mode
+            ;;
+    alsa)
+            trap "alsa_mode update" USR1
+            alsa_mode
+            ;;
     *)
             echo "Invalid mode $mode, check -h for mode info." 1>&2
             exit 1
