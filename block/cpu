@@ -1,0 +1,82 @@
+#!/bin/sh
+
+usage() {
+    echo "Usage: $0 [-n SLEEP] [-f PRECISION] TYPE"
+    echo "Block for printing CPU information."
+    echo ""
+
+    echo "Arguments"
+    echo "  -n"  "SLEEP" "\tUpdate interval in seconds."
+    echo "  -f"  "PRECISION" "\tFloating point precision, when used."
+    echo ""
+
+    echo "TYPE corresponds to the type of cpu info to print. One of:"
+    echo "\t""temp (default)"
+}
+
+cpu_temp() {
+    if ! command -v > /dev/null sensors; then
+        echo "lm_sensors is not installed, aborting." 1>&2
+        exit 1
+    fi
+
+    sensors | awk -v p="$precision" '
+        BEGIN {
+            core_count = 0
+            temp_sum = 0
+        }
+
+        $1 == "Core" {
+            core_count += 1
+            temp_sum += $3
+        }
+
+        END {
+            out = temp_sum/core_count
+            printf "%." p "f\n", out
+        }
+    '
+}
+
+loop() {
+    case "$type" in
+        temp) cmd=cpu_temp ;;
+        *)
+            echo "Invalid type. Check -h for more info." 1>&2
+            exit 1
+    esac
+
+    while :; do
+        eval "$cmd"
+        sleep $sleep
+        wait $!
+    done
+}
+
+sleep=10
+precision=2
+while getopts i:f:h opt; do
+    case "$opt" in
+        n)
+            sleep="$OPTARG"
+            ;;
+        t)
+            type="$OPTARG"
+            ;;
+        f)
+            precision="$OPTARG"
+            ;;
+        h)
+            usage
+            exit 0
+            ;;
+        ?)
+            usage
+            exit 1
+    esac
+done
+
+shift $((OPTIND - 1))
+type="$@"
+
+loop
