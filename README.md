@@ -68,9 +68,9 @@ We recommend using [zplug](github.com/zplug/zplug) for an easy installation:
 (Don't forget to set the path to the tender blocks!)
 #### ~/.zshrc
 ```zsh
-export TENDERBLOCKS="<ZPLUG_HOME>/repos/CherryMan/bartender/block"
+export TENDERBLOCKS="<ZPLUG_HOME>/repos/Snowlabs/bartender/block"
 
-zplug "CherryMan/bartender", use:"genbar", as:command
+zplug "Snowlabs/bartender", use:"genbar", as:command
 ```
 
 ## Blocks
