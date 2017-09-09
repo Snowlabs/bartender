@@ -90,7 +90,7 @@ For i3wm, print the focused window.
 **Deps**: `python3`
 **PyPI modules**: `i3ipc`
 
-####i3ws
+#### i3ws
 
 Print the workspaces under i3wm.
 **Deps**: `python3`
