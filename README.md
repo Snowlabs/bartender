@@ -79,7 +79,20 @@ zplug "Snowlabs/bartender", use:"genbar", as:command
 
 Prints the current time. Uses the same format as the `date` command.
 
+| Option | Description | Default |
+| :----: | ----------- | :-----: |
+| `-n` | Update interval for the clock | `5` |
+| | Format used by the `date` command | |
+
 #### disk
+
+| Option | Description | Default |
+| :----: | ----------- | :-----: |
+| `-n` | Update inverval | `300` |
+| `-H` | Make output human readable | `false` |
+| `-t` | Type of info to output: size, used available, used% | percent |
+| `-f` | Floating point precision for human-readable output | `2` |
+| | Path to the mounted partition | `/` |
 
 Print info about the specified partition. Can print the disk size, used space,
 available space and the used percentage.
@@ -92,11 +105,33 @@ For i3wm, print the focused window.
 
 #### i3ws
 
+| Option | Description | Default |
+| :----: | ----------- | :-----: |
+| `-m` | Which monitor to show workspaces from | All |
+| `-c` | Add lemonbar formatted scroll actions | |
+| `-S` | Strip workspace numbers | |
+| `-B` | Add lemonbar formatted numbers for changing workspace | |
+| `-s` | Separator | |
+| `-f` | Prefix and suffix for unfocused workspace | |
+| `-F` | Prefix and suffix for focused workspace | |
+| `-u` | Prefix and suffix for urgent workspace | |
+
 Print the workspaces under i3wm.
 **Deps**: `python3`
 **PyPI modules**: `i3ipc`
 
 #### music
+
+Default button arguments use [fontawesome](http://fontawesome.io/).
+
+| Option | Description | Default |
+| :----: | ----------- | :-----: |
+| `-f` | Specify the format of the output | |
+| `-s` | Used with `-f`. Specify the spacer string | |
+| `-p` | String for the previous button | |
+| `-n` | String for the next button | |
+| `-P` | String for the play button | |
+| `-S` | String for the payse button | |
 
 Print information about music, using various backends. Current supports only
 `mpd` through `mpc`.
@@ -104,6 +139,13 @@ Print information about music, using various backends. Current supports only
 **Optional deps**: `mpc`
 
 #### vol
+
+| Option | Description | Default |
+| :----: | ----------- | :-----: |
+| `-j` | Use the jamyxer backend | |
+| `-c` | Audio channel to use | |
+| `-s` | Add lemonbar scroll buttons to change volume | |
+| `-i` | Interval for changing volume | |
 
 Print volume information, for various backends. Currently supports: ALSA,
 [jamyxer](https://github.com/Javyre/jamyxer)
