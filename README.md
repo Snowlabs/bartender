@@ -75,7 +75,8 @@ zplug "Snowlabs/bartender", use:"genbar", as:command
 
 ## Blocks
 
-#### clock
+### clock
+##
 
 Prints the current time. Uses the same format as the `date` command.
 
@@ -84,7 +85,8 @@ Prints the current time. Uses the same format as the `date` command.
 | `-n` | Update interval for the clock | `5` |
 | | Format used by the `date` command | |
 
-#### disk
+### disk
+##
 
 | Option | Description | Default |
 | :----: | ----------- | :-----: |
@@ -97,13 +99,15 @@ Prints the current time. Uses the same format as the `date` command.
 Print info about the specified partition. Can print the disk size, used space,
 available space and the used percentage.
 
-#### i3window
+### i3window
+##
 
 For i3wm, print the focused window.
 **Deps**: `python3`
 **PyPI modules**: `i3ipc`
 
-#### i3ws
+### i3ws
+##
 
 | Option | Description | Default |
 | :----: | ----------- | :-----: |
@@ -120,7 +124,8 @@ Print the workspaces under i3wm.
 **Deps**: `python3`
 **PyPI modules**: `i3ipc`
 
-#### music
+### music
+##
 
 Default button arguments use [fontawesome](http://fontawesome.io/).
 
@@ -138,7 +143,8 @@ Print information about music, using various backends. Current supports only
 
 **Optional deps**: `mpc`
 
-#### vol
+### vol
+##
 
 | Option | Description | Default |
 | :----: | ----------- | :-----: |
