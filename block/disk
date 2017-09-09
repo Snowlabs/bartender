@@ -60,7 +60,7 @@ run() {
     done
 }
 
-sleep=120
+sleep=300
 human=0 # false
 type=percent
 precision=2
