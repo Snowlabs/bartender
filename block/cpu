@@ -55,13 +55,10 @@ loop() {
 
 sleep=10
 precision=2
-while getopts i:f:h opt; do
+while getopts n:f:h opt; do
     case "$opt" in
         n)
             sleep="$OPTARG"
-            ;;
-        t)
-            type="$OPTARG"
             ;;
         f)
             precision="$OPTARG"
@@ -73,6 +70,7 @@ while getopts i:f:h opt; do
         ?)
             usage
             exit 1
+            ;;
     esac
 done
 
