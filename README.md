@@ -72,3 +72,40 @@ export TENDERBLOCKS="<ZPLUG_HOME>/repos/CherryMan/bartender/block"
 
 zplug "CherryMan/bartender", use:"genbar", as:command
 ```
+
+## Blocks
+
+####clock
+
+Prints the current time. Uses the same format as the `date` command.
+
+####disk
+
+Print info about the specified partition. Can print the disk size, used space,
+available space and the used percentage.
+
+####i3window
+
+For i3wm, print the focused window.
+**Deps**: `python3`
+**PyPI modules**: `i3ipc`
+
+####i3ws
+
+Print the workspaces under i3wm.
+**Deps**: `python3`
+**PyPI modules**: `i3ipc`
+
+####music
+
+Print information about music, using various backends. Current supports only
+`mpd` through `mpc`.
+
+**Optional deps**: `mpc`
+
+####vol
+
+Print volume information, for various backends. Currently supports: ALSA,
+[jamyxer](https://github.com/Javyre/jamyxer)
+
+**Optional deps**: `alsa-utils` or `jmctl` (from jamyxer)
