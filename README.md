@@ -7,6 +7,8 @@
 <b><a href="#usage">Usage</a></b>
 |
 <b><a href="#installation">Installation</a></b>
+|
+<b><a href="#blocks">Blocks</a></b>
 </p>
 
 ***
@@ -78,6 +80,13 @@ zplug "Snowlabs/bartender", use:"genbar", as:command
 *`<zplug_home>` is `~/.zplug` by default*
 
 ## Blocks
+- <b><a href="#clock">clock</a></b>
+- <b><a href="#disk">disk</a></b>
+- <b><a href="#i3window">i3window</a></b>
+- <b><a href="#i3ws">i3ws</a></b>
+- <b><a href="#music">music</a></b>
+- <b><a href="#vol">vol</a></b>
+
 
 ### clock
 <img src="https://raw.githubusercontent.com/Snowlabs/bartender/master/assets/Blocks/clock.png" alt="clock" height="35px">
