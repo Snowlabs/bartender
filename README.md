@@ -69,7 +69,9 @@ be used to point to the `block` directory.
 
 ```
 $ git clone https://github.com/Snowlabs/bartender ~/.local/share/Bartender
+$ mkdir -p ~/bin
 $ ln -sT ~/.local/share/Bartender/genbar ~/bin/genbar
+$ chmod +x ~/bin/genbar
 # make sure bin ~/bin is in your PATH
 ```
 
