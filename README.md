@@ -72,6 +72,7 @@ export TENDERBLOCKS="<ZPLUG_HOME>/repos/Snowlabs/bartender/block"
 
 zplug "Snowlabs/bartender", use:"genbar", as:command
 ```
+*`<zplug_home>` is `~/.zplug` by default*
 
 ## Blocks
 
