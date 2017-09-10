@@ -67,6 +67,17 @@ directory to PATH. For the blocks, any script can be used. `genbar` allows the
 usage of a `$TENDERBLOCKS` variable, which is prepended to the PATH. This can
 be used to point to the `block` directory.
 
+```
+$ git clone https://github.com/Snowlabs/bartender ~/.local/share/Bartender
+$ ln -sT ~/.local/share/Bartender/genbar ~/bin/genbar
+# make sure bin ~/bin is in your PATH
+```
+
+#### ~/.bashrc or ~/.zshrc
+```bash
+export TENDERBLOCKS="~/.local/share/bartender/block"
+```
+
 ### Recommended Installation
 
 We recommend using [zplug](github.com/zplug/zplug) for an easy installation:
