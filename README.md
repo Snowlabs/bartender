@@ -72,6 +72,7 @@ export TENDERBLOCKS="<ZPLUG_HOME>/repos/Snowlabs/bartender/block"
 
 zplug "Snowlabs/bartender", use:"genbar", as:command
 ```
+*`<zplug_home>` is `~/.zplug` by default*
 
 ## Blocks
 
@@ -94,7 +95,7 @@ Prints the current time. Uses the same format as the `date` command.
 | `-H` | Make output human readable | `false` |
 | `-t` | Type of info to output: size, used available, used% | percent |
 | `-f` | Floating point precision for human-readable output | `2` |
-| | Path to the mounted partition | `/` |
+| | Mountpoint of the partition | `/` |
 
 Print info about the specified partition. Can print the disk size, used space,
 available space and the used percentage.
