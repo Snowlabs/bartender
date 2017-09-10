@@ -80,12 +80,16 @@ zplug "Snowlabs/bartender", use:"genbar", as:command
 *`<zplug_home>` is `~/.zplug` by default*
 
 ## Blocks
-- <b><a href="#clock">clock</a></b>
-- <b><a href="#disk">disk</a></b>
-- <b><a href="#i3window">i3window</a></b>
-- <b><a href="#i3ws">i3ws</a></b>
-- <b><a href="#music">music</a></b>
-- <b><a href="#vol">vol</a></b>
+:bomb:: Event-based
+
+:hourglass:: Not event-based
+
+- :hourglass: <b><a href="#clock">clock</a></b>
+- :hourglass: <b><a href="#disk">disk</a></b>
+- :bomb:      <b><a href="#i3window">i3window</a></b>
+- :bomb:      <b><a href="#i3ws">i3ws</a></b>
+- :bomb:      <b><a href="#music">music</a></b>
+- :bomb:      <b><a href="#vol">vol</a></b>
 
 
 ### clock
@@ -116,6 +120,9 @@ available space and the used percentage.
 <img src="https://raw.githubusercontent.com/Snowlabs/bartender/master/assets/Blocks/i3window.png" alt="i3window" height="35px">
 
 For i3wm, print the focused window.
+
+Event-based
+
 **Deps**: `python3`
 **PyPI modules**: `i3ipc`
 
@@ -134,6 +141,9 @@ For i3wm, print the focused window.
 | `-u` | Prefix and suffix for urgent workspace | |
 
 Print the workspaces under i3wm.
+
+Event-based
+
 **Deps**: `python3`
 **PyPI modules**: `i3ipc`
 
@@ -152,7 +162,9 @@ Default button arguments use [fontawesome](http://fontawesome.io/).
 | `-S` | String for the payse button | |
 
 Print information about music, using various backends. Current supports only
-`mpd` through `mpc`.
+`mpd`-based servers through `mpc`.
+
+Event-based with `mpc`
 
 **Optional deps**: `mpc`
 
@@ -164,9 +176,11 @@ Print information about music, using various backends. Current supports only
 | `-j` | Use the jamyxer backend | |
 | `-c` | Audio channel to use | |
 | `-s` | Add lemonbar scroll buttons to change volume | |
-| `-i` | Interval for changing volume | |
+| `-i` | Interval for changing volume (step) | |
 
 Print volume information, for various backends. Currently supports: ALSA,
 [jamyxer](https://github.com/Javyre/jamyxer)
+
+Event-based with the jamyxer backend
 
 **Optional deps**: `alsa-utils` or `jmctl` (from jamyxer)
