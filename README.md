@@ -16,6 +16,9 @@ Designed to be used with `lemonbar`
 ## Usage
 ![Usage](assets/Usage.png)
 
+![Blocks](assets/Blocks.png)
+*many more blocks to come... (contributions are very welcome)*
+
 ### Configuration
 
 Bars can easily be generated using a shell script. The script must have the
