@@ -38,7 +38,7 @@ piped to sh for buttons.
 ### Example
 
 ````sh
-#!/bin/env sh
+#!/bin/sh
 
 # Optional env variable used by genbar to prepend to the path
 export TENDERBLOCKS="path/to/bartender/block"
